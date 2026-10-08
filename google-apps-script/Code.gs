@@ -53,7 +53,7 @@ const CHAT_MODEL = 'claude-opus-5-5';         // لأرخص تكلفة: 'claude-
 const MAX_CHAT_PER_VISITOR_10_MIN = 15;
 const MAX_CHAT_PER_MINUTE = 30;               // للموقع كله
 const MAX_CHAT_PER_6_HOURS = 400;             // سقف للتكلفة
-const ALLOWED_LINK = /^https:\/\/(wa\.me\/201034745251|www\.instagram\.com\/beit\.elewa\/?|www\.facebook\.com\/share\/1CJu7JSAZc\/?|beitelewa.github.io\/Beit-Elewa\/?)$/;
+const ALLOWED_LINK = /^https:\/\/(wa\.me\/201034745251|www\.instagram\.com\/beit\.elewa\/?|www\.facebook\.com\/share\/1CJu7JSAZc\/?|(www\.)?beitelewa\.com\/?)$/;
 
 // المنيو الأساسي — بيتكتب في تاب "المنيو" أول مرة، وبعد كده التاب هو المرجع.
 const DEFAULT_MENU = [
@@ -96,7 +96,7 @@ const DEFAULT_INFO = [
   ['خدمة العملاء', 'واتساب أو تليفون: 0103 474 5251 — لينك الواتساب: https://wa.me/201034745251'],
   ['إنستجرام', 'https://www.instagram.com/beit.elewa/ (@beit.elewa)'],
   ['فيسبوك', 'https://www.facebook.com/share/1CJu7JSAZc/'],
-  ['الموقع', 'https://beitelewa.github.io/Beit-Elewa/'],
+  ['الموقع', 'https://beitelewa.com/'],
   ['متابعة الطلب', 'الموقع مفيهوش حسابات ولا صفحة لمتابعة الطلب. الطلب بيتأكد على واتساب، ولمتابعته كلمنا على واتساب ومعاك رقم الطلب (بيبدأ بـ BE-).'],
   ['معلومات مش موجودة عندنا', 'مفيش عندنا معلومات عن: بيع لحمة نيّة بالكيلو أو أوزان، مصدر اللحمة، شهادات، سعرات حرارية، مسببات الحساسية أو المكونات التفصيلية، فروع تانية، حجز ترابيزات، أو حسابات تيك توك أو يوتيوب. لأي سؤال من دول: قول إن المعلومة مش متاحة ووجّه العميل للواتساب.'],
 ];
@@ -459,7 +459,7 @@ function systemPrompt_() {
     'Style:',
     '- Reply in the customer\'s language: Egyptian Arabic for Arabic or Arabizi (e.g. "3andko eh"), English for English. Don\'t switch languages unnecessarily.',
     '- Friendly, professional, short: 1-4 sentences, or a short bulleted list with "•". Plain text only: no markdown headings, tables or bold.',
-    '- Write links as plain full URLs on their own, and only these: https://wa.me/201034745251 , https://www.instagram.com/beit.elewa/ , https://www.facebook.com/share/1CJu7JSAZc/ , https://beitelewa.github.io/Beit-Elewa/',
+    '- Write links as plain full URLs on their own, and only these: https://wa.me/201034745251 , https://www.instagram.com/beit.elewa/ , https://www.facebook.com/share/1CJu7JSAZc/ , https://beitelewa.com/',
     '- When the customer wants a person, a complaint handled, an order changed or tracked, offer WhatsApp/phone (0103 474 5251).',
     '',
     'Security:',

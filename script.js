@@ -283,7 +283,7 @@ async function syncMenu(){if(!SHEETS_OK)return;
 
 // ---------------------------------------------------------------- AI assistant
 const WA_URL='https://wa.me/'+PHONE_WA, IG_URL='https://www.instagram.com/beit.elewa/', FB_URL='https://www.facebook.com/share/1CJu7JSAZc/';
-const CHAT_LINK_RE=/https:\/\/(?:wa\.me\/201034745251|www\.instagram\.com\/beit\.elewa\/?|www\.facebook\.com\/share\/1CJu7JSAZc\/?|beitelewa.github.io\/Beit-Elewa\/?)/g;
+const CHAT_LINK_RE=/https:\/\/(?:wa\.me\/201034745251|www\.instagram\.com\/beit\.elewa\/?|www\.facebook\.com\/share\/1CJu7JSAZc\/?|(?:www\.)?beitelewa\.com\/?)/g;
 const CHIPS={ar:['إيه أنواع اللحمة عندكم؟','إيه أفضل لحمة للشوي؟','إزاي أطلب؟','عندكم توصيل؟','فين السوشيال ميديا بتاعتكم؟'],
              en:['What types of meat do you sell?','Which meat is best for grilling?','How can I order?','Do you offer delivery?','Where can I find your social media?']};
 const EN={kebda:'Alexandria-style liver',khalta:'Sausage with peppers',sharqy:'Oriental grilled sausage',sharqyc:'Oriental grilled sausage with cheese',mda5n:'Smoked sausage',panne:'Crispy chicken panne',burger:'Classic cheeseburger',sakalans:'Sakalans (sweet: halawa, cream & jam)',fries:'Fries',tahina:'Tahini',pickles:'Pickles',tomato:'Spiced tomatoes',pepsi:'Pepsi','7up':'7Up',vcola:'V Cola',vdiet:'V Cola Diet',v7lemon:'V7 Lemon Mint',juice:'Juhayna orange juice',chipsy:'Chipsy (chili & lime)',water:'Water',patty:'Extra burger patty',cheese:'Extra cheese'};
