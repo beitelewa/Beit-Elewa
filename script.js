@@ -29,10 +29,10 @@ const ITEMS=[
  {id:'pickles',cat:'sides',name:'مخلل',desc:'مخلل بلدي',price:10,img:'bw-pickles',side:1},
  {id:'tomato',cat:'sides',name:'طماطم متبلة',desc:'طماطم متبلة بالتوابل والكزبرة',price:15,img:'bw-tomato',side:1},
  // drinks & snacks — prices are placeholders until the restaurant confirms them
- {id:'pepsi',cat:'drinks',name:'بيبسي',desc:'كانز ساقع',price:20,img:'pepsi-wood',side:1,drink:1},
- {id:'7up',cat:'drinks',name:'سفن أب',desc:'كانز ساقع',price:20,img:'7up-wood',side:1,drink:1},
- {id:'vcola',cat:'drinks',name:'في كولا',desc:'كانز ساقع',price:20,img:'vcola-wood',side:1,drink:1},
- {id:'vdiet',cat:'drinks',name:'في كولا دايت',desc:'كانز ساقع — بدون سكر',price:20,img:'vcola-diet-wood',side:1,drink:1},
+ {id:'pepsi',cat:'drinks',name:'بيبسي',desc:'كانز ساقع',price:25,img:'pepsi-v2',side:1,drink:1},
+ {id:'7up',cat:'drinks',name:'سفن أب',desc:'كانز ساقع',price:25,img:'7up-v2',side:1,drink:1},
+ {id:'vcola',cat:'drinks',name:'في كولا',desc:'كانز ساقع',price:25,img:'vcola-v2',side:1,drink:1},
+ {id:'vdiet',cat:'drinks',name:'في كولا دايت',desc:'كانز ساقع — بدون سكر',price:25,img:'vdiet-v2',side:1,drink:1},
  {id:'water',cat:'drinks',name:'مياه',desc:'مياه معدنية',price:10,img:'water-wood',side:1,drink:1},
 ];
 // Combo: fries + a can for each sandwich, picked in the cart.
