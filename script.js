@@ -16,13 +16,14 @@ const ITEMS=[
  {id:'kebda',cat:'kebda',name:'كبدة',desc:'كبدة اسكندراني حراقة في عيش فينو',price:25,img:'kebda-v2',badge:'الأكثر طلباً'},
  {id:'khalta',cat:'sogo2',name:'سجق بالخلطة',desc:'سجق بالخلطة والفلفل الألوان',price:35,img:'khalta-v2'},
  {id:'sharqy',cat:'sogo2',name:'سجق شرقي سادة',desc:'سجق شرقي مشوي في عيش فينو',price:35,img:'bw-sharqy'},
- {id:'sharqyc',cat:'sogo2',name:'سجق شرقي بالجبنة',desc:'سجق شرقي مشوي مع جبنة سايحة',price:40,img:'sharqy-cheese-v2'},
+ {id:'sharqyc',cat:'sogo2',name:'سجق شرقي بالجبنة',desc:'سجق شرقي مشوي مع جبنة سايحة',price:40,img:'sharqy-cheese-v3'},
  {id:'mda5n',cat:'mda5n',name:'سجق مدخن',desc:'سجق مدخن بالطعم المصري الجميل في عيش فينو طازة',price:25,img:'bw-mda5n'},
  {id:'panne',cat:'panne',name:'بانيه',desc:'بانيه فراخ مقرمش مع الخس والصوص',price:120,img:'bw-panne'},
  {id:'burger',cat:'burger',name:'كلاسيك برجر',desc:'كلاسيك برجر بالجبنة',price:130,img:'bw-burger',badge:'مميز'},
  {id:'patty',cat:'addon',name:'قطعة برجر زيادة',desc:'قطعة لحمة برجر زيادة جوه الساندوتش',price:90,img:'bw-burger',side:1,hidden:1,addonFor:['burger']},
  {id:'cheese',cat:'addon',name:'جبنة زيادة',desc:'جبنة سايحة زيادة على الساندوتش',price:15,img:'sharqy-cheese-v2',side:1,hidden:1,addonFor:['kebda','khalta','sharqy','sharqyc','mda5n','panne','burger']},
  {id:'sakalans',cat:'sweet',name:'سكلانس',desc:'حلاوة بالقشطة والمربى في عيش فينو',price:35,img:'bw-sakalans'},
+ {id:'friessandwich',cat:'sides',name:'ساندوتش بطاطس',desc:'بطاطس مقرمشة بالكاتشب والمايونيز في عيش فينو',price:55,img:'bw-fries'},
  {id:'fries',cat:'sides',name:'بطاطس',desc:'بطاطس مقلية مقرمشة',price:25,img:'bw-fries',side:1},
  {id:'tahina',cat:'sides',name:'طحينة',desc:'طحينة طازة',price:15,img:'bw-tahina',side:1},
  {id:'pickles',cat:'sides',name:'مخلل',desc:'مخلل بلدي',price:10,img:'bw-pickles',side:1},
@@ -286,7 +287,7 @@ const WA_URL='https://wa.me/'+PHONE_WA, IG_URL='https://www.instagram.com/beit.e
 const CHAT_LINK_RE=/https:\/\/(?:wa\.me\/201034745251|www\.instagram\.com\/beit\.elewa\/?|www\.facebook\.com\/share\/1CJu7JSAZc\/?|(?:www\.)?beitelewa\.com\/?)/g;
 const CHIPS={ar:['إيه أنواع اللحمة عندكم؟','إيه أفضل لحمة للشوي؟','إزاي أطلب؟','عندكم توصيل؟','فين السوشيال ميديا بتاعتكم؟'],
              en:['What types of meat do you sell?','Which meat is best for grilling?','How can I order?','Do you offer delivery?','Where can I find your social media?']};
-const EN={kebda:'Alexandria-style liver',khalta:'Sausage with peppers',sharqy:'Oriental grilled sausage',sharqyc:'Oriental grilled sausage with cheese',mda5n:'Smoked sausage',panne:'Crispy chicken panne',burger:'Classic cheeseburger',sakalans:'Sakalans (sweet: halawa, cream & jam)',fries:'Fries',tahina:'Tahini',pickles:'Pickles',tomato:'Spiced tomatoes',pepsi:'Pepsi','7up':'7Up',vcola:'V Cola',vdiet:'V Cola Diet',v7lemon:'V7 Lemon Mint',juice:'Juhayna orange juice',chipsy:'Chipsy (chili & lime)',water:'Water',patty:'Extra burger patty',cheese:'Extra cheese'};
+const EN={kebda:'Alexandria-style liver',friessandwich:'Fries sandwich',khalta:'Sausage with peppers',sharqy:'Oriental grilled sausage',sharqyc:'Oriental grilled sausage with cheese',mda5n:'Smoked sausage',panne:'Crispy chicken panne',burger:'Classic cheeseburger',sakalans:'Sakalans (sweet: halawa, cream & jam)',fries:'Fries',tahina:'Tahini',pickles:'Pickles',tomato:'Spiced tomatoes',pepsi:'Pepsi','7up':'7Up',vcola:'V Cola',vdiet:'V Cola Diet',v7lemon:'V7 Lemon Mint',juice:'Juhayna orange juice',chipsy:'Chipsy (chili & lime)',water:'Water',patty:'Extra burger patty',cheese:'Extra cheese'};
 const EN_KEYS={kebda:/liver|kebda|kibda|كبد/,khalta:/khalta|خلطه/,sharqy:/sharqy|shar2y|oriental|شرقي/,mda5n:/smoked|mda5en|mdakhan|مدخن/,panne:/panne|pane|chicken|بانيه|فراخ/,burger:/burger|برجر/,sakalans:/sakalans|سكلانس/,fries:/fries|batates|بطاطس/,pepsi:/pepsi|بيبسي/,'7up':/7 ?up|سفن/,vcola:/v ?cola|في كولا/,juice:/juice|juhayna|عصير|جهينه/,chipsy:/chipsy|شيبسي/,water:/water|مياه|ميه/};
 let chatLog=[], chatBusy=false, chatLang='ar';
 try{const s=JSON.parse(sessionStorage.getItem('be_chat')||'[]');if(Array.isArray(s))chatLog=s.filter(m=>m&&(m.role==='user'||m.role==='assistant')&&typeof m.content==='string').slice(-30)}catch(e){}
