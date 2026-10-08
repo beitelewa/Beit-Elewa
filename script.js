@@ -2,7 +2,7 @@ const PHONE_WA='201034745251';
 // Delivery fee per area (EGP), used until the manager's sheet answers; the sheet's
 // "مناطق التوصيل" tab then replaces it. Pickup from the branch is always free.
 const ZONES={'زهراء مدينة نصر':20,'الواحة':20};
-const BRANCH='زهراء مدينة نصر — موقف الحي العاشر';
+const BRANCH='زهراء مدينة نصر — شارع المحكمة العسكرية، مول دهب';
 // Google Sheets order log: paste the Apps Script Web App URL (ends with /exec).
 // While this is the placeholder, nothing is sent and ordering works as before.
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbz_K3D93oY1dpF7l0fPaghlgMKzY8Be3qrg2tQ11im8gMigbYJQuPenm5eVyx5j-TxkPg/exec';
@@ -250,11 +250,11 @@ function initTheme(){
   try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintTheme)}catch(e){}
 }
 
-// ---------------------------------------------------------------- open now (Cairo time, 11 AM - 3 AM)
+// ---------------------------------------------------------------- open now (Cairo time, 11 AM - 2 AM)
 function initOpenNow(){const el=$('#openNow');if(!el)return;
   const upd=()=>{let hr;try{hr=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',hour:'numeric',hourCycle:'h23'}).format(new Date()))}catch(e){hr=(new Date().getUTCHours()+3)%24}
-    const open=hr>=11||hr<3; el.classList.toggle('closed',!open);
-    el.querySelector('span').textContent=open?'مفتوحين دلوقتي · ١١ ص – ٣ ف':'مقفولين دلوقتي · بنفتح ١١ الصبح'};
+    const open=hr>=11||hr<2; el.classList.toggle('closed',!open);
+    el.querySelector('span').textContent=open?'مفتوحين دلوقتي · ١١ ص – ٢ ف':'مقفولين دلوقتي · بنفتح ١١ الصبح'};
   upd();setInterval(upd,60000)}
 
 // ---------------------------------------------------------------- prices & availability from the manager's sheet
@@ -312,9 +312,9 @@ function localAnswer(text){const t=norm(text), ar=isAr(text), has=re=>re.test(t)
   if(has(/تيك ?توك|يوتيوب|tiktok|youtube/))return ar?`معنديش لينك رسمي لتيك توك أو يوتيوب. حساباتنا الرسمية:\n• إنستجرام: ${IG_URL}\n• فيسبوك: ${FB_URL}`:`I don't have an official TikTok or YouTube link. Our official accounts:\n• Instagram: ${IG_URL}\n• Facebook: ${FB_URL}`;
   if(has(/انستا|انستجرام|انستغرام|فيس|سوشيال|سوشال|صفحه|صفحتكم|instagram|insta|facebook|\bfb\b|social/))return ar?`تقدر تتابعنا هنا:\n• إنستجرام: ${IG_URL}\n• فيسبوك: ${FB_URL}\nولو حابب تكلمنا: ${WA_URL}`:`You can follow Beit Elewa here:\n• Instagram: ${IG_URL}\n• Facebook: ${FB_URL}\nOr message us on WhatsApp: ${WA_URL}`;
   if(has(/تتبع|متابعه|فين طلبي|طلبي فين|track|my order|where is my/))return ar?`الموقع مفيهوش صفحة لمتابعة الطلب. الطلب بيتأكد على واتساب، ولمتابعته كلمنا ومعاك رقم الطلب (بيبدأ بـ BE-): ${WA_URL}`:`The website has no order-tracking page. Orders are confirmed on WhatsApp; to follow up, message us with your order number (starts with BE-): ${WA_URL}`;
-  if(has(/مواعيد|بتفتحو|تفتحو|بتقفلو|تقفلو|مفتوحين|امتي|hours|open|close|timing|mawa3id/))return ar?'مفتوحين كل يوم من ١١ الصبح لحد ٣ الفجر.':'We are open every day from 11 AM to 3 AM.';
-  if(has(/توصيل|دليفري|ديليفري|بتوصلو|توصلو|delivery|deliver|tawsil/))return ar?`أيوه، بنوصّل لـ ${zones} بس. ولو هتستلم من الفرع (زهراء مدينة نصر — موقف الحي العاشر) مفيش مصاريف توصيل. الدفع كاش عند الاستلام.`:`Yes, we deliver to ${zones} only. Pickup from the branch (Zahraa Nasr City, El Hay El Asher parking) has no delivery fee. Payment is cash on delivery.`;
-  if(has(/فين|عنوان|فرع|فروع|مكان|لوكيشن|location|address|branch|where are/))return ar?'عندنا فرع واحد في زهراء مدينة نصر — موقف الحي العاشر.':'We have one branch: Zahraa Nasr City, El Hay El Asher parking.';
+  if(has(/مواعيد|بتفتحو|تفتحو|بتقفلو|تقفلو|مفتوحين|امتي|hours|open|close|timing|mawa3id/))return ar?'مفتوحين كل يوم من ١١ الصبح لحد ٢ الفجر.':'We are open every day from 11 AM to 2 AM.';
+  if(has(/توصيل|دليفري|ديليفري|بتوصلو|توصلو|delivery|deliver|tawsil/))return ar?`أيوه، بنوصّل لـ ${zones} بس. ولو هتستلم من الفرع (زهراء مدينة نصر — شارع المحكمة العسكرية، مول دهب) مفيش مصاريف توصيل. الدفع كاش عند الاستلام.`:`Yes, we deliver to ${zones} only. Pickup from the branch (Zahraa Nasr City, El Mahkama El Askareya St., Dahab Mall) has no delivery fee. Payment is cash on delivery.`;
+  if(has(/فين|عنوان|فرع|فروع|مكان|لوكيشن|location|address|branch|where are/))return ar?'عندنا فرع واحد في زهراء مدينة نصر — شارع المحكمة العسكرية، مول دهب.':'We have one branch: Zahraa Nasr City, El Mahkama El Askareya St., Dahab Mall.';
   if(has(/دفع|فيزا|كاش|كارت|انستاباي|pay|card|cash|visa/))return INSTAPAY_ON?(ar?`الدفع كاش عند الاستلام، أو InstaPay: بتحوّل الإجمالي على ${INSTAPAY.address} وتبعت صورة التحويل على واتساب مع رقم الطلب.`:`You can pay cash on delivery or by InstaPay: transfer the total to ${INSTAPAY.address} and send the transfer screenshot on WhatsApp with your order number.`):(ar?'الدفع كاش عند الاستلام. مفيش دفع أونلاين على الموقع.':'Payment is cash on delivery or pickup. There is no online payment on the website.');
   if(has(/عرض|عروض|خصم|offer|deal|discount|promo/))return ar?`مفيش عروض خصم حالياً. بس تقدر تخلي أي ساندوتش كومبو بـ ${COMBO_PRICE} ج (بطاطس + كانز) من السلة.`:`There are no discount offers at the moment, but any sandwich can be a combo for ${COMBO_PRICE} EGP (fries + a can), added from the cart.`;
   if(has(/كومبو|combo|اضافات|اضافه|زياده|extra|add.?on/))return ar?`ممكن تخلي أي ساندوتش كومبو بـ ${COMBO_PRICE} ج (بطاطس + كانز تختاره) من السلة. وفيه جبنة زيادة بـ ${BY.cheese.price} ج لأي ساندوتش، وقطعة برجر زيادة بـ ${BY.patty.price} ج مع البرجر.`:`Any sandwich can be a combo for ${COMBO_PRICE} EGP (fries + a can of your choice), added from the cart. Extra cheese is ${BY.cheese.price} EGP, and an extra burger patty is ${BY.patty.price} EGP with the burger.`;
