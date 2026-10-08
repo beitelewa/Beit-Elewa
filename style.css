@@ -227,7 +227,9 @@ section.sec{padding-block:80px 8px;scroll-margin-top:calc(var(--hdr) + 70px)}
 .c-card .icon{color:var(--red);width:28px;height:28px}
 .c-card h3{font-size:24px;margin-top:6px}
 .c-card p{margin:0;color:var(--muted)}
-.c-card .big{font-family:var(--display);font-size:28px;color:var(--ink);direction:ltr;text-align:right;user-select:all}
+.c-card .big{font-family:var(--display);font-size:28px;color:var(--ink);direction:ltr;text-align:right;user-select:all;text-decoration:none}
+.c-card a.big:hover{color:var(--red)}
+a.tel{color:inherit;text-decoration:underline;text-underline-offset:3px}
 footer{margin-top:88px;background:var(--char);color:var(--cream);padding-block:40px 120px}
 footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
 footer .logo-txt b{color:var(--mustard)}

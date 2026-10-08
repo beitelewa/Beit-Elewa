@@ -206,7 +206,7 @@ function renderDrawer(){
       <button class="btn btn-ghost" id="copy" style="margin-top:10px;width:100%">انسخ نص الطلب</button>`;
     F.innerHTML=`<div class="tot grand"><span>الإجمالي</span><span class="num">${ar(t.total)} ج</span></div>
       <a class="btn wa" id="waBtn" href="https://wa.me/${PHONE_WA}?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">افتح واتساب وابعت الطلب</a>
-      <span style="font-size:13px;color:var(--muted);text-align:center">أو كلمنا على <span class="num" style="direction:ltr;user-select:all">0103 474 5251</span></span>`;
+      <span style="font-size:13px;color:var(--muted);text-align:center">أو كلمنا على <a class="num tel" href="tel:+201034745251" style="direction:ltr">0103 474 5251</a></span>`;
     $('#back').onclick=()=>{orderId=null;step='form';renderDrawer()};
     const ipc=$('#ipCopy'); if(ipc) ipc.onclick=()=>{navigator.clipboard.writeText(INSTAPAY.address).then(()=>toast('اتنسخ عنوان InstaPay')).catch(()=>toast(INSTAPAY.address))};
     $('#waBtn').addEventListener('click',()=>logOrder(t));
@@ -295,7 +295,7 @@ function chatId(){try{let id=localStorage.getItem('be_cid');if(!/^[a-z0-9]{12}$/
 const norm=t=>String(t).toLowerCase().replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[\u064B-\u0652]/g,'');
 const isAr=t=>/[\u0600-\u06FF]/.test(t)||/[a-z][2375]|[2375][a-z]|\b(3and|3ayz|3ayez|eh|ezay|ezzay|feen|fen|bkam|mesh|msh|ya3ni|7aga|el)\b/i.test(t);
 function chatHTML(s){const label=u=>/wa\.me/.test(u)?'WhatsApp':/instagram/.test(u)?'Instagram':/facebook/.test(u)?'Facebook':u;
-  return esc(s).replace(CHAT_LINK_RE,u=>`<a href="${u}" target="_blank" rel="noopener nofollow">${label(u)}</a>`).replace(/\n/g,'<br>')}
+  return esc(s).replace(CHAT_LINK_RE,u=>`<a href="${u}" target="_blank" rel="noopener nofollow">${label(u)}</a>`).replace(/0103 ?474 ?5251|01034745251/g,n=>`<a href="tel:+201034745251" dir="ltr">${n}</a>`).replace(/\n/g,'<br>')}
 function renderMsg(m){const d=document.createElement('div');d.className='msg '+(m.role==='user'?'me':'bot');d.dir='auto';d.innerHTML=chatHTML(m.content);$('#chatLog').appendChild(d);$('#chatLog').scrollTop=$('#chatLog').scrollHeight}
 function addMsg(role,content){const m={role,content:String(content).slice(0,2000)};chatLog.push(m);chatLog=chatLog.slice(-30);renderMsg(m);try{sessionStorage.setItem('be_chat',JSON.stringify(chatLog))}catch(e){}}
 function typing(on){const ex=$('#chatTyping');if(on&&!ex){const d=document.createElement('div');d.id='chatTyping';d.className='msg bot typing';d.setAttribute('aria-label','بيكتب');d.innerHTML='<i></i><i></i><i></i>';$('#chatLog').appendChild(d);$('#chatLog').scrollTop=$('#chatLog').scrollHeight}else if(!on&&ex)ex.remove()}
