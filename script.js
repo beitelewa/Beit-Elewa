@@ -23,7 +23,7 @@ const ITEMS=[
  {id:'patty',cat:'addon',name:'قطعة برجر زيادة',desc:'قطعة لحمة برجر زيادة جوه الساندوتش',price:90,img:'bw-burger',side:1,hidden:1,addonFor:['burger']},
  {id:'cheese',cat:'addon',name:'جبنة زيادة',desc:'جبنة سايحة زيادة على الساندوتش',price:15,img:'sharqy-cheese-v2',side:1,hidden:1,addonFor:['kebda','khalta','sharqy','sharqyc','mda5n','panne','burger']},
  {id:'sakalans',cat:'sweet',name:'سكلانس',desc:'حلاوة بالقشطة والمربى في عيش فينو',price:35,img:'bw-sakalans'},
- {id:'friessandwich',cat:'sides',name:'ساندوتش بطاطس',desc:'بطاطس مقرمشة بالكاتشب والمايونيز في عيش فينو',price:55,img:'bw-fries'},
+ {id:'friessandwich',cat:'sides',name:'ساندوتش بطاطس',desc:'بطاطس مقرمشة بالكاتشب والمايونيز في عيش فينو',price:55,img:'fries-sandwich'},
  {id:'fries',cat:'sides',name:'بطاطس',desc:'بطاطس مقلية مقرمشة',price:25,img:'bw-fries',side:1},
  {id:'tahina',cat:'sides',name:'طحينة',desc:'طحينة طازة',price:15,img:'bw-tahina',side:1},
  {id:'pickles',cat:'sides',name:'مخلل',desc:'مخلل بلدي',price:10,img:'bw-pickles',side:1},
