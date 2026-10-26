@@ -297,7 +297,7 @@ const isAr=t=>/[\u0600-\u06FF]/.test(t)||/[a-z][2375]|[2375][a-z]|\b(3and|3ayz|3
 function chatHTML(s){const label=u=>/wa\.me/.test(u)?'WhatsApp':/instagram/.test(u)?'Instagram':/facebook/.test(u)?'Facebook':u;
   return esc(s).replace(CHAT_LINK_RE,u=>`<a href="${u}" target="_blank" rel="noopener nofollow">${label(u)}</a>`).replace(/0103 ?474 ?5251|01034745251/g,n=>`<a href="tel:+201034745251" dir="ltr">${n}</a>`).replace(/\n/g,'<br>')}
 function renderMsg(m){const d=document.createElement('div');d.className='msg '+(m.role==='user'?'me':'bot');d.dir='auto';d.innerHTML=chatHTML(m.content);$('#chatLog').appendChild(d);$('#chatLog').scrollTop=$('#chatLog').scrollHeight}
-function addMsg(role,content){const m={role,content:String(content).slice(0,2000)};chatLog.push(m);chatLog=chatLog.slice(-30);renderMsg(m);try{sessionStorage.setItem('be_chat',JSON.stringify(chatLog))}catch(e){}}
+function addMsg(role,content,sig){const m={role,content:String(content).slice(0,2000)};if(typeof sig==='string'&&sig)m.sig=sig;chatLog.push(m);chatLog=chatLog.slice(-30);renderMsg(m);try{sessionStorage.setItem('be_chat',JSON.stringify(chatLog))}catch(e){}}
 function typing(on){const ex=$('#chatTyping');if(on&&!ex){const d=document.createElement('div');d.id='chatTyping';d.className='msg bot typing';d.setAttribute('aria-label','بيكتب');d.innerHTML='<i></i><i></i><i></i>';$('#chatLog').appendChild(d);$('#chatLog').scrollTop=$('#chatLog').scrollHeight}else if(!on&&ex)ex.remove()}
 function renderChips(){const other=chatLang==='ar'?'en':'ar';
   $('#chatChips').innerHTML=CHIPS[chatLang].map(q=>`<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join('')+`<button type="button" class="lang" data-lang="${other}">${other==='en'?'English':'عربي'}</button>`;
@@ -333,15 +333,15 @@ function noAnswer(code,ar){const pre={RATE_LIMITED:ar?'بعت رسايل كتي�
 async function sendChat(raw){const text=String(raw||'').trim().slice(0,500); if(!text||chatBusy)return;
   const ar=isAr(text); chatLang=ar?'ar':'en'; renderChips();
   addMsg('user',text); chatBusy=true; $('#chatSend').disabled=true; typing(true);
-  let reply=null, code='';
+  let reply=null, code='', sig='';
   if(SHEETS_OK){try{const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),35000);
       const r=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},signal:ctl.signal,
-        body:JSON.stringify({action:'chat',clientId:chatId(),messages:chatLog.slice(-12)})});
+        body:JSON.stringify({action:'chat',clientId:chatId(),messages:chatLog.slice(-12).map(m=>m.sig?{role:m.role,content:m.content,sig:m.sig}:{role:m.role,content:m.content})})});
       clearTimeout(tm); const d=await r.json();
-      if(d&&d.ok===true&&typeof d.reply==='string'&&d.reply.trim())reply=d.reply.trim(); else code=d&&typeof d.error==='string'?d.error:'ERR';
+      if(d&&d.ok===true&&typeof d.reply==='string'&&d.reply.trim()){reply=d.reply;sig=typeof d.sig==='string'?d.sig:''} else code=d&&typeof d.error==='string'?d.error:'ERR';
     }catch(e){code='NETWORK'}}
   if(!reply)reply=(code==='RATE_LIMITED'?null:localAnswer(text))||noAnswer(code,ar);
-  typing(false); addMsg('assistant',reply); chatBusy=false; $('#chatSend').disabled=false}
+  typing(false); addMsg('assistant',reply,sig); chatBusy=false; $('#chatSend').disabled=false}
 function openChat(){$('#chat').hidden=false;$('#chatFab').hidden=true;
   if(!chatLog.length)addMsg('assistant','أهلاً بيك في بيت عليوه! أنا المساعد الآلي. اسألني عن المنيو والأسعار والتوصيل والكومبو أو إزاي تطلب.\nHi! Ask me anything about Beit Elewa, in Arabic or English.');
   setTimeout(()=>$('#chatInput').focus(),50)}

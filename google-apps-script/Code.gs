@@ -47,12 +47,16 @@ const COMBO_DRINKS = ['pepsi', '7up', 'vcola', 'vdiet'];
 
 const MAX_ORDERS_PER_PHONE_10_MIN = 3;
 const MAX_ORDERS_PER_MINUTE = 20;
+const MAX_ORDERS_PER_HOUR = 150;              // للمطعم كله — بيمنع إغراق الشيت بطلبات وهمية بأرقام مختلفة
+const MAX_ORDERS_PER_6_HOURS = 500;
 
 // المساعد الذكي
 const CHAT_MODEL = 'claude-opus-5-5';         // لأرخص تكلفة: 'claude-haiku-5-5'
+const CHAT_MAX_TOKENS = 1500;                 // سقف لطول/تكلفة الرد الواحد (الرد نفسه ٤ جمل بالكتير)
 const MAX_CHAT_PER_VISITOR_10_MIN = 15;
 const MAX_CHAT_PER_MINUTE = 30;               // للموقع كله
-const MAX_CHAT_PER_6_HOURS = 400;             // سقف للتكلفة
+const MAX_CHAT_PER_6_HOURS = 300;             // سقف للتكلفة
+const MAX_CHAT_PER_DAY = 600;                 // سقف يومي للتكلفة (بتوقيت القاهرة)
 const ALLOWED_LINK = /^https:\/\/(wa\.me\/201034745251|www\.instagram\.com\/beit\.elewa\/?|www\.facebook\.com\/share\/1CJu7JSAZc\/?|(www\.)?beitelewa\.com\/?)$/;
 
 // المنيو الأساسي — بيتكتب في تاب "المنيو" أول مرة، وبعد كده التاب هو المرجع.
@@ -200,16 +204,23 @@ function order_(body) {
   const order = validateOrder_(body);
   const cache = CacheService.getScriptCache();
   const lock = LockService.getScriptLock();
-  lock.waitLock(15000);
+  if (!lock.tryLock(15000)) return json_({ ok: false, error: 'BUSY' });
   try {
     if (cache.get('id:' + order.orderId) || orderIdExists_(order.orderId)) return json_({ ok: true, duplicate: true });
 
     const rateKey = 'rl:' + order.phone;
     const recent = Number(cache.get(rateKey) || 0);
     if (recent >= MAX_ORDERS_PER_PHONE_10_MIN) return json_({ ok: false, error: 'TOO_MANY_ORDERS' });
-    const minuteKey = 'all:' + Math.floor(Date.now() / 60000);
+    const now = Date.now();
+    const minuteKey = 'all:' + Math.floor(now / 60000);
+    const hourKey = 'oh:' + Math.floor(now / 3600000);
+    const sixKey = 'o6:' + Math.floor(now / 21600000);
     const perMinute = Number(cache.get(minuteKey) || 0);
-    if (perMinute >= MAX_ORDERS_PER_MINUTE) return json_({ ok: false, error: 'BUSY' });
+    const perHour = Number(cache.get(hourKey) || 0);
+    const perSix = Number(cache.get(sixKey) || 0);
+    if (perMinute >= MAX_ORDERS_PER_MINUTE || perHour >= MAX_ORDERS_PER_HOUR || perSix >= MAX_ORDERS_PER_6_HOURS) {
+      return json_({ ok: false, error: 'BUSY' });
+    }
 
     const p = price_(order);
     const warnings = p.warnings.slice();
@@ -230,6 +241,8 @@ function order_(body) {
     cache.put('id:' + order.orderId, '1', 21600);
     cache.put(rateKey, String(recent + 1), 600);
     cache.put(minuteKey, String(perMinute + 1), 120);
+    cache.put(hourKey, String(perHour + 1), 3700);
+    cache.put(sixKey, String(perSix + 1), 21600);
   } finally {
     lock.releaseLock();
   }
@@ -371,15 +384,14 @@ function chat_(body) {
   if (!clientId) return json_({ ok: false, error: 'BAD_REQUEST' });
   const messages = validateChat_(body.messages);
 
-  // Abuse and cost limits
-  const cache = CacheService.getScriptCache();
-  const bump = (key, max, ttl) => { const n = Number(cache.get(key) || 0); if (n >= max) return false; cache.put(key, String(n + 1), ttl); return true; };
-  if (!bump('cv:' + clientId, MAX_CHAT_PER_VISITOR_10_MIN, 600)) return json_({ ok: false, error: 'RATE_LIMITED' });
-  if (!bump('cm:' + Math.floor(Date.now() / 60000), MAX_CHAT_PER_MINUTE, 120)) return json_({ ok: false, error: 'BUSY' });
-  if (!bump('c6:' + Math.floor(Date.now() / 21600000), MAX_CHAT_PER_6_HOURS, 21600)) return json_({ ok: false, error: 'BUSY' });
-
   const key = PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
   if (!key) return json_({ ok: false, error: 'NOT_CONFIGURED' });
+
+  // Abuse and cost limits. Counters are read and written under a lock so a burst of
+  // parallel requests can't slip past them. The visitor id is chosen by the browser, so the
+  // site-wide caps (per minute / 6 hours / day) are what actually bound the cost.
+  const limit = chatLimits_(clientId);
+  if (limit) return json_({ ok: false, error: limit });
 
   const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
     method: 'post',
@@ -391,7 +403,7 @@ function chat_(body) {
     },
     payload: JSON.stringify({
       model: CHAT_MODEL,
-      max_tokens: 4000,
+      max_tokens: CHAT_MAX_TOKENS,
       output_config: { effort: 'low' },
       fallbacks: 'default',
       system: [{ type: 'text', text: systemPrompt_(), cache_control: { type: 'ephemeral' } }],
@@ -407,22 +419,70 @@ function chat_(body) {
   }
   const data = JSON.parse(res.getContentText());
   if (data.stop_reason === 'refusal') {
-    return json_({ ok: true, reply: 'معلش، مقدرش أساعد في ده. أقدر أساعدك في المنيو والأسعار والتوصيل والطلب. ولو محتاج حد من المطعم: https://wa.me/201034745251' });
+    return reply_('معلش، مقدرش أساعد في ده. أقدر أساعدك في المنيو والأسعار والتوصيل والطلب. ولو محتاج حد من المطعم: https://wa.me/201034745251');
   }
   let text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
   // Only the restaurant's own links may appear in a reply.
   text = text.replace(/https?:\/\/[^\s)<>"']+/g, u => (ALLOWED_LINK.test(u.replace(/[.,،]+$/, '')) ? u : ''));
   text = text.replace(/\*\*/g, '').slice(0, 1800).trim();
   if (!text) return json_({ ok: false, error: 'AI_ERROR' });
-  return json_({ ok: true, reply: text });
+  return reply_(text);
 }
 
-/** Keeps at most the last 12 turns, user/assistant alternating, starting and ending with the customer. */
+/** Every assistant reply carries a signature; only signed replies are accepted back as chat history. */
+function reply_(text) {
+  return json_({ ok: true, reply: text, sig: sign_(text) });
+}
+
+/** Per-visitor and site-wide chat limits, checked and counted atomically. Returns an error code or ''. */
+function chatLimits_(clientId) {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(5000)) return 'BUSY';
+  try {
+    const cache = CacheService.getScriptCache();
+    const now = Date.now();
+    const day = Utilities.formatDate(new Date(now), TZ, 'yyyyMMdd');
+    const checks = [
+      ['cv:' + clientId, MAX_CHAT_PER_VISITOR_10_MIN, 600, 'RATE_LIMITED'],
+      ['cm:' + Math.floor(now / 60000), MAX_CHAT_PER_MINUTE, 120, 'BUSY'],
+      ['c6:' + Math.floor(now / 21600000), MAX_CHAT_PER_6_HOURS, 21600, 'BUSY'],
+    ];
+    const counts = checks.map(c => Number(cache.get(c[0]) || 0));
+    for (let i = 0; i < checks.length; i++) if (counts[i] >= checks[i][1]) return checks[i][3];
+    // The cache keeps values 6 hours at most, so the daily total lives in Script Properties.
+    const props = PropertiesService.getScriptProperties();
+    const dayCount = props.getProperty('chat_day') === day ? Number(props.getProperty('chat_day_count') || 0) : 0;
+    if (dayCount >= MAX_CHAT_PER_DAY) return 'BUSY';
+    checks.forEach((c, i) => cache.put(c[0], String(counts[i] + 1), c[2]));
+    props.setProperties({ chat_day: day, chat_day_count: String(dayCount + 1) });
+    return '';
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** HMAC-SHA256 with a random secret kept in Script Properties (created on first use, never sent out). */
+function sign_(text) {
+  const props = PropertiesService.getScriptProperties();
+  let secret = props.getProperty('CHAT_SIGNING_SECRET');
+  if (!secret) {
+    secret = Utilities.getUuid() + Utilities.getUuid();
+    props.setProperty('CHAT_SIGNING_SECRET', secret);
+  }
+  return Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(text, secret));
+}
+
+/**
+ * Keeps at most the last 12 turns, user/assistant alternating, starting and ending with the customer.
+ * Assistant turns must carry the signature this script gave them, so a visitor can't put
+ * invented "assistant" lines into the history to steer the model.
+ */
 function validateChat_(list) {
   if (!Array.isArray(list) || list.length < 1 || list.length > 30) throw new Error('BAD_REQUEST');
   const out = [];
   list.slice(-12).forEach(function (m) {
     if (!m || (m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string') return;
+    if (m.role === 'assistant' && (typeof m.sig !== 'string' || m.content.length > 2000 || m.sig !== sign_(m.content))) return;
     const content = m.content.trim().slice(0, m.role === 'user' ? 600 : 2000);
     if (!content) return;
     if (out.length && out[out.length - 1].role === m.role) out[out.length - 1].content += '\n' + content;
@@ -493,11 +553,13 @@ function ordersSheet_() {
   return ss.getSheetByName(ORDERS_SHEET);
 }
 
+/** Duplicate check over the most recent 2000 orders (retries happen within minutes; keeps it fast as the sheet grows). */
 function orderIdExists_(id) {
   const sh = ordersSheet_();
   const last = sh.getLastRow();
   if (last < 2) return false;
-  return !!sh.getRange(2, 2, last - 1, 1).createTextFinder(id).matchEntireCell(true).findNext();
+  const first = Math.max(2, last - 1999);
+  return !!sh.getRange(first, 2, last - first + 1, 1).createTextFinder(id).matchEntireCell(true).findNext();
 }
 
 /** Stops text like "=HYPERLINK(...)" typed by a customer from running as a formula in the sheet. */
