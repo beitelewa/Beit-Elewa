@@ -4,8 +4,7 @@
 
 ```
 index.html   style.css   script.js   img/      ← الموقع (GitHub Pages)
-google-apps-script/Code.gs                     ← حفظ الطلبات في Google Sheets
-backend/                                       ← (اختياري لبعدين) قاعدة بيانات Supabase
+الباك إند (كود Google Sheets وملاحظات الأمان) ← في ريبو خاص: beitelewa/Beit-Elewa-backend
 ```
 
 
@@ -30,7 +29,7 @@ backend/                                       ← (اختياري لبعدين)
 ----------------------------
 كل طلب بيتسجل لوحده في شيت خاص بالمدير (التاريخ، رقم الطلب، الأصناف، الإجمالي، بيانات العميل)،
 وفي نفس اللحظة العميل بيروح للواتساب زي ما هو.
-- الكود في: google-apps-script/Code.gs (خطوات التركيب مكتوبة بالعربي في أول الملف)
+- الكود في الريبو الخاص beitelewa/Beit-Elewa-backend (مش منشور على الموقع)
 - بعد التركيب حط رابط الـ Web App في script.js مكان: PASTE_YOUR_WEB_APP_URL_HERE
 - رقم الطلب (زي BE-1008-2130-K7QX) بيظهر في رسالة الواتساب وفي الشيت، عشان تطابقهم.
 - عمود "الحالة" في الشيت فيه قائمة: جديد / اتأكد / بيتجهز / خرج للتوصيل / جاهز للاستلام / اتسلم / ملغي
@@ -40,8 +39,7 @@ backend/                                       ← (اختياري لبعدين)
 -----------------------------------
 1. ادخل github.com بحسابك ← New repository ← الاسم مثلاً: beit-elewa ← Public ← Create repository
 2. في صفحة الـ repository: Add file ← Upload files ← اسحب كل محتويات الفولدر ده
-   (index.html و style.css و script.js و فولدر img) ← Commit changes
-   (فولدر google-apps-script مش لازم يترفع، ده بيتحط في جوجل شيت)
+   (index.html و style.css و script.js و فولدر img) ← Commit changes
 3. Settings ← Pages ← Source: Deploy from a branch ← Branch: main و /(root) ← Save
 4. استنى دقيقة أو اتنين، الموقع هيبقى على: https://beitelewa.github.io/Beit-Elewa/
 5. الدومين بتاعك (بعد ما تشتريه): Settings ← Pages ← Custom domain ← اكتب الدومين ← Save
